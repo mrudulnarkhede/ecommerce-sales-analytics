@@ -95,10 +95,10 @@ def clean_data(df: pd.DataFrame):
     )
 
     data["InvoiceDate"] = pd.to_datetime(
-        data["InvoiceDate"],
-        errors="coerce",
-        dayfirst=True
-    )
+    data["InvoiceDate"],
+    errors="coerce",
+    format="mixed"
+)
 
     data["CustomerID"] = pd.to_numeric(
         data["CustomerID"], errors="coerce"

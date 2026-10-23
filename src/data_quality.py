@@ -37,9 +37,10 @@ def profile_dataset(file_path: Path) -> pd.DataFrame:
     quantity = pd.to_numeric(df["Quantity"], errors="coerce")
     price = pd.to_numeric(df["UnitPrice"], errors="coerce")
     dates = pd.to_datetime(
-        df["InvoiceDate"], errors="coerce", dayfirst=True
-    )
-
+    df["InvoiceDate"],
+    errors="coerce",
+    format="mixed"
+)
     checks = {
         "exact_duplicate_rows": int(df.duplicated().sum()),
         "cancelled_invoice_lines": int(
@@ -53,9 +54,8 @@ def profile_dataset(file_path: Path) -> pd.DataFrame:
         "invalid_price_rows": int(price.isna().sum()),
         "invalid_date_rows": int(dates.isna().sum()),
         "blank_description_rows": int(
-            df["Description"].isna().sum()
-            + df["Description"].fillna("").str.strip().eq("").sum()
-        ),
+                   df["Description"].fillna("").str.strip().eq("").sum()
+          ),
         "missing_customer_ids": int(df["CustomerID"].isna().sum()),
         "unique_products": int(df["StockCode"].nunique()),
         "unique_countries": int(df["Country"].nunique()),
