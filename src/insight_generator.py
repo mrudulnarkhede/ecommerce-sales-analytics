@@ -272,13 +272,13 @@ def generate_findings() -> list[str]:
     output_path = REPORT_DIR / "findings.txt"
 
     report_text = (
-        "E-COMMERCE SALES ANALYTICS — AUTOMATED FINDINGS\n"
-        "Currency: GBP (£)\n"
-        "Revenue represents the included cleaned positive-quantity sales "
-        "lines; it is not profit or net revenue after returns.\n\n"
-        + "\n".join(findings)
-        + "\n"
-    )
+    "E-COMMERCE SALES ANALYTICS - AUTOMATED FINDINGS\n"
+    "Currency: GBP (Pounds Sterling)\n"
+    "Revenue represents the included cleaned positive-quantity sales "
+    "lines; it is not profit or net revenue after returns.\n\n"
+    + "\n".join(findings)
+    + "\n"
+)
 
     output_path.write_text(report_text, encoding="utf-8")
 

@@ -84,7 +84,7 @@ def generate_charts() -> None:
     ax.set_ylabel("Revenue (GBP £)")
     ax.tick_params(axis="x", rotation=45)
     fig.tight_layout()
-    fig.savefig(CHART_DIR / "monthly_revenue_trend.png", dpi=150)
+    fig.savefig(CHART_DIR / "monthly_sales_trend.png", dpi=150)
     plt.close(fig)
 
     # 2. Top five products by revenue

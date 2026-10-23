@@ -105,7 +105,7 @@ def main(argv=None):
         # Step 4: Generate KPIs and analytical summaries.
         logging.info("Step 4/7: Generating analytics")
         REPORT_DIR.mkdir(parents=True, exist_ok=True)
-        export_analytics(categorized_df, REPORT_DIR)
+        export_analytics(categorized_df, REPORT_DIR, PROCESSED_DIR)
 
         # Step 5: Generate descriptive statistics and outlier reports.
         logging.info("Step 5/7: Generating statistical reports")

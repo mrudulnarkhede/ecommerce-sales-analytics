@@ -134,6 +134,7 @@ def build_monthly_summary(df: pd.DataFrame) -> pd.DataFrame:
 def export_analytics(
     df: pd.DataFrame,
     output_dir: Path,
+    processed_dir: Path | None = None,
 ) -> dict:
     """Generate analytical tables and export results."""
 
@@ -157,7 +158,9 @@ def export_analytics(
     categories = build_category_summary(df)
     monthly = build_monthly_summary(df)
 
-    orders.to_csv(output_dir / "order_level_data.csv", index=False)
+    orders_output_dir = processed_dir or output_dir
+    orders_output_dir.mkdir(parents=True, exist_ok=True)
+    orders.to_csv(orders_output_dir / "order_level_data.csv", index=False)
     products.to_csv(output_dir / "product_sales_summary.csv", index=False)
     categories.to_csv(output_dir / "category_sales_summary.csv", index=False)
     monthly.to_csv(output_dir / "monthly_sales_summary.csv", index=False)
