@@ -133,10 +133,11 @@ def generate_findings() -> list[str]:
     )
 
     findings.append(
-        f"1. Highest-revenue product: {product_name} "
-        f"(StockCode {top_revenue_product['StockCode']}), "
-        f"with GBP {top_revenue_product['Revenue']:,.2f} in revenue."
-    )
+    f"1. Highest-revenue product: {product_name} "
+    f"(StockCode {top_revenue_product['StockCode']}), "
+    f"with GBP {top_revenue_product['Revenue']:,.2f} in "
+    f"revenue."
+)
 
     # 2. Highest-unit product.
     top_units_product = products.sort_values(
@@ -161,13 +162,13 @@ def generate_findings() -> list[str]:
     ).iloc[0]
 
     findings.append(
-        f"3. Highest-revenue category: {top_category['Category']}, "
-        f"contributing "
-        f"{top_category['Revenue_Contribution_Percent']:.2f}% "
-        f"of recorded revenue (GBP {top_category['Revenue']:,.2f}). "
-        "Categories are keyword-derived estimates, not source-provided labels."
-    )
-
+    f"3. Highest-revenue category: {top_category['Category']}, "
+    f"contributing "
+    f"{top_category['Revenue_Contribution_Percent']:.2f}% "
+    f"of recorded "
+    f"revenue (GBP {top_category['Revenue']:,.2f}). "
+    "Categories are keyword-derived estimates, not source-provided labels."
+)
     # 4. Highest-revenue month.
     top_month = monthly.sort_values(
         ["Revenue", "Year_Month"], ascending=[False, True]

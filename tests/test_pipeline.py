@@ -11,7 +11,9 @@ from src.analytics import (
     build_product_summary,
     build_category_summary,
     build_monthly_summary,
+    filter_sales_data,
 )
+
 
 
 def sample_sales_data():
@@ -156,3 +158,53 @@ def test_cleaning_rejects_missing_required_columns():
 
     with pytest.raises((KeyError, ValueError)):
         clean_data(df)
+
+def test_filter_by_category_and_minimum_sales():
+    df = sample_sales_data()
+
+    result = filter_sales_data(
+        df,
+        category="Home and Decor",
+        min_sales=12,
+    )
+
+    assert len(result) == 1
+    assert result.iloc[0]["Total_Sales"] == pytest.approx(15.0)
+
+
+def test_filter_by_date_range():
+    df = sample_sales_data()
+
+    result = filter_sales_data(
+        df,
+        start_date="2011-02-01",
+        end_date="2011-02-28",
+    )
+
+    assert len(result) == 2
+    assert result["Total_Sales"].sum() == pytest.approx(55.0)
+
+
+def test_filter_top_n_products_by_revenue():
+    df = sample_sales_data()
+
+    result = filter_sales_data(df, top_n=1)
+
+    assert set(result["StockCode"]) == {"C"}
+    assert result["Total_Sales"].sum() == pytest.approx(40.0)
+
+
+def test_filter_rejects_invalid_sales_range():
+    df = sample_sales_data()
+
+    with pytest.raises(ValueError, match="min_sales"):
+        filter_sales_data(df, min_sales=50, max_sales=10)
+
+
+def test_filter_does_not_modify_input():
+    df = sample_sales_data()
+    original = df.copy(deep=True)
+
+    filter_sales_data(df, category="Toys")
+
+    pd.testing.assert_frame_equal(df, original)

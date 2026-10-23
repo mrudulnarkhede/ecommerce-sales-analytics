@@ -175,3 +175,113 @@ def export_analytics(
         print(f"{key}: {value}")
 
     return kpis
+
+def filter_sales_data(
+    df: pd.DataFrame,
+    product: str | None = None,
+    category: str | None = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
+    min_sales: float | None = None,
+    max_sales: float | None = None,
+    top_n: int | None = None,
+) -> pd.DataFrame:
+    """Filter transaction rows using product, category, date, and sales criteria.
+
+    If top_n is supplied, retain rows belonging to the top N products
+    ranked by total revenue within the already-filtered data.
+    The input DataFrame is not modified.
+    """
+    if df.empty:
+        return df.copy()
+
+    result = df.copy()
+
+    if product is not None:
+        product_columns = [
+            column
+            for column in ("Product", "Description", "StockCode")
+            if column in result.columns
+        ]
+        if not product_columns:
+            raise ValueError(
+                "Product filtering requires Product, Description, or StockCode."
+            )
+
+        product_mask = pd.Series(False, index=result.index)
+        for column in product_columns:
+            product_mask |= (
+                result[column]
+                .astype("string")
+                .str.contains(product, case=False, na=False, regex=False)
+            )
+        result = result.loc[product_mask]
+
+    if category is not None:
+        if "Category" not in result.columns:
+            raise ValueError("Category filtering requires a Category column.")
+
+        result = result.loc[
+            result["Category"]
+            .astype("string")
+            .str.contains(category, case=False, na=False, regex=False)
+        ]
+
+    if start_date is not None or end_date is not None:
+        if "InvoiceDate" not in result.columns:
+            raise ValueError("Date filtering requires an InvoiceDate column.")
+
+        dates = pd.to_datetime(result["InvoiceDate"], errors="coerce")
+
+        if start_date is not None:
+            start = pd.to_datetime(start_date, errors="raise")
+            result = result.loc[dates >= start]
+
+        if end_date is not None:
+            end = pd.to_datetime(end_date, errors="raise")
+            result = result.loc[dates <= end]
+
+    if min_sales is not None or max_sales is not None:
+        if "Total_Sales" not in result.columns:
+            raise ValueError("Sales filtering requires a Total_Sales column.")
+
+        if min_sales is not None and max_sales is not None:
+            if min_sales > max_sales:
+                raise ValueError("min_sales cannot exceed max_sales.")
+
+        if min_sales is not None:
+            result = result.loc[result["Total_Sales"] >= min_sales]
+
+        if max_sales is not None:
+            result = result.loc[result["Total_Sales"] <= max_sales]
+
+    if top_n is not None:
+        if not isinstance(top_n, int) or isinstance(top_n, bool) or top_n < 1:
+            raise ValueError("top_n must be a positive integer.")
+
+        if "Total_Sales" not in result.columns:
+            raise ValueError("Top-N filtering requires a Total_Sales column.")
+
+        product_column = next(
+            (
+                column
+                for column in ("StockCode", "Product", "Description")
+                if column in result.columns
+            ),
+            None,
+        )
+
+        if product_column is None:
+            raise ValueError(
+                "Top-N filtering requires StockCode, Product, or Description."
+            )
+
+        top_products = (
+            result.groupby(product_column)["Total_Sales"]
+            .sum()
+            .nlargest(top_n)
+            .index
+        )
+        result = result.loc[result[product_column].isin(top_products)]
+
+    return result.copy()
